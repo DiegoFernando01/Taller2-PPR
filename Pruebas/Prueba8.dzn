@@ -1,0 +1,26 @@
+% Escenario 8:
+% - 4 plantas (dos hidro) y 3 clientes
+% - 4 días
+% Más complejidad, se mezcla nuclear, 2 hidro, térmica.
+
+p = 4;
+m = 3;
+n = 4;
+
+plantNames = ["Nuclear", "Hidroelectrica1", "Hidroelectrica2", "Termica"];
+clientNames = ["ClienteA", "ClienteB", "ClienteC"];
+
+cost = [40.0, 22.0, 25.0, 55.0];
+capacity = [1000, 300, 300, 500];
+payment = [90.0, 100.0, 95.0];
+
+demand = array2d(1..m, 1..n, [
+   60, 80, 110, 100,
+   100, 110, 120, 130,
+   200, 150, 100, 80
+]);
+
+G = 0.50;
+
+highThreshold = [0.8, 0.75, 0.75, 0.8];
+maxConsecutiveHigh = [2, 1, 1, 2];

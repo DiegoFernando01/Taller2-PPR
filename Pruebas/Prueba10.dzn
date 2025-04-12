@@ -1,0 +1,39 @@
+% Escenario 10:
+% - 4 plantas
+% - 4 clientes
+% - 5 días
+% Demandas altas y umbrales variados.
+% Se espera que sea el caso más exigente para el solver.
+
+p = 4;
+m = 4;
+n = 5;
+
+plantNames = ["Nuclear", "Hidroelectrica", "Termica1", "Termica2"];
+clientNames = ["ClienteA", "ClienteB", "ClienteC", "ClienteD"];
+
+% Costos de producción
+cost = [50.0, 20.0, 45.0, 48.0];
+
+% Capacidades
+capacity = [1200, 500, 400, 400];
+
+% Pagos por MW
+payment = [110.0, 120.0, 95.0, 100.0];
+
+% Demanda para 5 días
+demand = array2d(1..m, 1..n, [
+  300, 400, 350, 420, 500,  % A
+  250, 280, 300, 360, 400,  % B
+  150, 150, 200, 250, 300,  % C
+  100, 150, 180, 200, 200   % D
+]);
+
+% Porcentaje mínimo
+G = 0.60;
+
+% Umbral para régimen alto
+highThreshold = [0.85, 0.8, 0.8, 0.8];
+
+% Máx. días consecutivos alto
+maxConsecutiveHigh = [2, 2, 1, 1];

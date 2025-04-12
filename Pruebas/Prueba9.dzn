@@ -1,0 +1,28 @@
+% Escenario 9:
+% - 4 plantas
+% - 4 clientes
+% - 3 días
+% Aumenta la complejidad: distintos costos, más clientes y la misma duración n=3.
+
+p = 4;
+m = 4;
+n = 3;
+
+plantNames = ["P1", "P2", "P3", "P4"];
+clientNames = ["A", "B", "C", "D"];
+
+cost = [40.0, 25.0, 25.0, 55.0];
+capacity = [600, 400, 400, 300];
+payment = [100.0, 105.0, 110.0, 120.0];
+
+demand = array2d(1..m, 1..n, [
+  100, 110,  90,
+  150,  98, 340,
+  200, 180, 150,
+  50,   50,  50
+]);
+
+G = 0.50;
+
+highThreshold = [0.8, 0.8, 0.75, 0.9];
+maxConsecutiveHigh = [1, 1, 2, 1];

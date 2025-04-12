@@ -1,0 +1,27 @@
+% Escenario 4:
+% - 3 plantas
+% - 3 clientes
+% - 3 días
+% Se cambian demanda y costos, con G=60%.
+
+p = 3;
+m = 3;
+n = 3;
+
+plantNames = ["Nuclear", "Hidroelectrica", "Termica"];
+clientNames = ["Cliente1", "Cliente2", "Cliente3"];
+
+cost = [30.0, 28.0, 55.0];
+capacity = [600, 350, 700];
+payment = [100.0, 120.0, 80.0];
+
+demand = array2d(1..m, 1..n, [
+  90,  60, 120,
+  100, 50, 150,
+  200, 70, 100
+]);
+
+G = 0.60;
+
+highThreshold = [0.8, 0.9, 0.8];
+maxConsecutiveHigh = [1, 1, 2];
