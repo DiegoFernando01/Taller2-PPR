@@ -69,3 +69,26 @@ var float: totalProfit =
   );
 
 solve maximize totalProfit;
+
+output [
+  "Ganancia total = ", show(totalProfit), "\n",
+  "Distribución (MW) por planta-cliente-día:\n",
+  join("", 
+    [ 
+      "Planta: " ++ show(plantNames[p_]) ++ 
+      ", Cliente: " ++ show(clientNames[c_]) ++ 
+      ", Día: " ++ show(d) ++ 
+      " -> " ++ show(X[p_,c_,d]) ++ "\n"
+      | p_ in 1..p, c_ in 1..m, d in 1..n
+    ]
+  ),
+  "\nRégimen alto por planta/día:\n",
+  join("", 
+    [
+      "Planta: " ++ show(plantNames[p_]) ++
+      ", Día: " ++ show(d) ++ 
+      ", Régimen alto = " ++ show(isHigh[p_,d]) ++ "\n"
+      | p_ in 1..p, d in 1..n
+    ]
+  )
+];
