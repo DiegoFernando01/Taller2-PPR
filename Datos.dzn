@@ -1,0 +1,30 @@
+p = 3;  % Ej: 3 plantas: nuclear, hidroeléctrica, térmica
+m = 2;  % Ej: 2 clientes
+n = 3;  % Ej: 3 días
+
+plantNames = ["Nuclear", "Hidroelectrica", "Termica"];
+clientNames = ["ClienteA", "ClienteB"];
+
+% Costos de producción por MW
+cost = [40.0, 25.0, 50.0];
+
+% Capacidades por planta (MW) en un día
+capacity = [1000, 300, 500];
+
+% Pagos por MW de cada cliente
+payment = [100.0, 120.0];
+
+% Demanda de cada cliente vs. día
+demand = array2d(1..m, 1..n, [
+   80, 110, 90,   % ClienteA, días 1..3
+   150, 98, 340   % ClienteB, días 1..3
+]);
+
+% Porcentaje mínimo a cubrir (ej: 50% = 0.50)
+G = 0.50;
+
+% Umbral para régimen alto por planta (ej. 0.8 para todas)
+highThreshold = [0.8, 0.8, 0.8];
+
+% Máx. días consecutivos en alto por planta
+maxConsecutiveHigh = [1, 1, 1];
