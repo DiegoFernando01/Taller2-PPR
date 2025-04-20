@@ -3,18 +3,18 @@
 % - 4 días
 % Más complejidad, se mezcla nuclear, 2 hidro, térmica.
 
-p = 4;
-m = 3;
-n = 4;
+np = 4;
+nc = 3;
+nd = 4;
 
-plantNames = ["Nuclear", "Hidroelectrica1", "Hidroelectrica2", "Termica"];
-clientNames = ["ClienteA", "ClienteB", "ClienteC"];
+nombrePlanta = ["Nuclear", "Hidroelectrica1", "Hidroelectrica2", "Termica"];
+nombreCliente = ["ClienteA", "ClienteB", "ClienteC"];
 
-cost = [40.0, 22.0, 25.0, 55.0];
-capacity = [1000, 300, 300, 500];
-payment = [90.0, 100.0, 95.0];
+costo = [40.0, 22.0, 25.0, 55.0];
+cap = [1000, 300, 300, 500];
+pago = [90.0, 100.0, 95.0];
 
-demand = array2d(1..m, 1..n, [
+dem = array2d(1..nc, 1..nd, [
    60, 80, 110, 100,
    100, 110, 120, 130,
    200, 150, 100, 80
@@ -22,5 +22,5 @@ demand = array2d(1..m, 1..n, [
 
 G = 0.50;
 
-highThreshold = [0.8, 0.75, 0.75, 0.8];
-maxConsecutiveHigh = [2, 1, 1, 2];
+umbralAlto = [0.8, 0.75, 0.75, 0.8];
+maxDiasAlto = [2, 1, 1, 2];

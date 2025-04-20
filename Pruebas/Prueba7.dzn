@@ -4,18 +4,18 @@
 % - 4 días
 % Se incrementa n=4, demands y G=0.5. Distintos costos y capac.
 
-p = 3;
-m = 3;
-n = 4;
+np = 3;
+nc = 3;
+nd = 4;
 
-plantNames = ["Nuclear", "Hidroelectrica", "Termica"];
-clientNames = ["Cli1", "Cli2", "Cli3"];
+nombrePlanta = ["Nuclear", "Hidroelectrica", "Termica"];
+nombreCliente = ["Cli1", "Cli2", "Cli3"];
 
-cost = [33.0, 26.0, 49.0];
-capacity = [950, 250, 400];
-payment = [105.0, 110.0, 90.0];
+costo = [33.0, 26.0, 49.0];
+cap = [950, 250, 400];
+pago = [105.0, 110.0, 90.0];
 
-demand = array2d(1..m, 1..n, [
+dem = array2d(1..nc, 1..nd, [
   100, 120, 150, 80,
   120, 100, 130, 90,
   100, 130, 140, 140
@@ -23,5 +23,5 @@ demand = array2d(1..m, 1..n, [
 
 G = 0.50;
 
-highThreshold = [0.8, 0.8, 0.8];
-maxConsecutiveHigh = [1, 1, 1];
+umbralAlto = [0.8, 0.8, 0.8];
+maxDiasAlto = [1, 1, 1];

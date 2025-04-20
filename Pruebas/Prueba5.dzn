@@ -4,23 +4,23 @@
 % - 5 días
 % Aumentan demandas y se mantiene G=50%.
 
-p = 3;
-m = 2;
-n = 5;
+np = 3;
+nc = 2;
+nd = 5;
 
-plantNames = ["Nuclear", "Hidroelectrica", "Termica"];
-clientNames = ["ClienteX", "ClienteY"];
+nombrePlanta = ["Nuclear", "Hidroelectrica", "Termica"];
+nombreCliente = ["ClienteX", "ClienteY"];
 
-cost = [45.0, 20.0, 60.0];
-capacity = [800, 600, 400];
-payment = [90.0, 120.0];
+costo = [45.0, 20.0, 60.0];
+cap = [800, 600, 400];
+pago = [90.0, 120.0];
 
-demand = array2d(1..m, 1..n, [
+dem = array2d(1..nc, 1..nd, [
   100, 100, 80,  200, 250,
   250, 300, 350, 100,  90
 ]);
 
 G = 0.50;
 
-highThreshold = [0.9, 0.8, 0.75];
-maxConsecutiveHigh = [1, 2, 1];
+umbralAlto = [0.9, 0.8, 0.75];
+maxDiasAlto = [1, 2, 1];

@@ -4,18 +4,18 @@
 % - 3 días
 % Alta cobertura (G=80%), costos muy bajos en nuclear/hidro y más clientes.
 
-p = 3;
-m = 4;
-n = 3;
+np = 3;
+nc = 4;
+nd = 3;
 
-plantNames = ["Nuclear", "Hidroelectrica", "Termica"];
-clientNames = ["A", "B", "C", "D"];
+nombrePlanta = ["Nuclear", "Hidroelectrica", "Termica"];
+nombreCliente = ["A", "B", "C", "D"];
 
-cost = [10.0, 12.0, 20.0];
-capacity = [300, 300, 300];
-payment = [40.0, 50.0, 60.0, 70.0];
+costo = [10.0, 12.0, 20.0];
+cap = [300, 300, 300];
+pago = [40.0, 50.0, 60.0, 70.0];
 
-demand = array2d(1..m, 1..n, [
+dem = array2d(1..nc, 1..nd, [
    20,  20,  30,
    30,  40,  50,
    60,  70,  40,
@@ -24,5 +24,5 @@ demand = array2d(1..m, 1..n, [
 
 G = 0.80;
 
-highThreshold = [0.9, 0.9, 0.9];
-maxConsecutiveHigh = [1, 2, 2];
+umbralAlto = [0.9, 0.9, 0.9];
+maxDiasAlto = [1, 2, 2];
