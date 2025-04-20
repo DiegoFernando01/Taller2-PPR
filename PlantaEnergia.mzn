@@ -1,94 +1,93 @@
-% objetivo: maximizar la ganancia = (ingresos totales) - (costos totales).
+% PlantaEnergia.mzn
 
 include "globals.mzn";
 
-% Parámetros
-int: p;  % número de plantas
-int: m;  % número de clientes
-int: n;  % número de días
+% PARÁMETROS
+int: np; % número de plantas
+int: nc; % número de clientes
+int: nd; % número de días
 
-array[int] of string: plantNames;   % Nombres simbólicos
-array[int] of string: clientNames;  % Nombres simbólicos
-array[int] of float: cost;          % Costo por MW de cada planta
-array[int] of int: capacity;        % Capacidad máxima de cada planta por día
-array[int] of float: payment;       % Pago por MW para cada cliente
-array[1..m,1..n] of int: demand;    % Demanda de cada cliente (filas) vs días (columnas)
-float: G;  % porcentaje mínimo a cubrir, ej. 0.50 = 50%
-array[int] of float: highThreshold;  % régimen alto en cada planta
-array[int] of int: maxConsecutiveHigh; % días consecutivos permitido en régimen alto por planta
+array[1..np] of string: nombrePlanta;
+array[1..nc] of string: nombreCliente;
 
-% Variables
-array[1..p, 1..m, 1..n] of var 0..10000: X; % Cantidad de MW que la planta p produce para el cliente c en el día d
-array[1..p,1..n] of var bool: isHigh; % si una planta p en día d está en régimen alto
+array[1..np] of float: costo; % costo por MW de cada planta
+array[1..np] of int: cap; % capacidad máxima (MW) de cada planta por día
+array[1..nc] of float: pago; % pago por MW de cada cliente
+array[1..nc,1..nd] of int: dem; % demanda de cada cliente c en el día d
 
-% restricciones
+float: G; % porcentaje mínimo de cobertura (0.0 - 1.0)
+array[1..np] of float: umbralAlto; % umbral para régimen alto (0.0 - 1.0) por planta
+array[1..np] of int: maxDiasAlto; % máx. días consecutivos en alto por planta
 
+% DOMINIOS
+int: capMax = max(i in 1..np)(cap[i]);  % capacidad máxima global
+
+% produccion[planta, cliente, día]
+array[1..np,1..nc,1..nd] of var 0..capMax: prod;
+% alto[planta, día] = 1 si está en régimen alto
+array[1..np,1..nd] of var bool: alto;
+
+% RESTRICCIONES
 constraint
-  forall(p_ in 1..p, d in 1..n) (
-    % 1) no exceder la capacidad diaria de la planta p_
-    sum(c in 1..m)( X[p_, c, d] ) <= capacity[p_]
+  % 1) Capacidad diaria de planta
+  forall(pl in 1..np, d in 1..nd) (
+    sum(c in 1..nc)( prod[pl,c,d] ) <= cap[pl]
   )
   /\
-  forall(c_ in 1..m, d in 1..n) (
-    % 2) Cubrir al menos G% de la demanda de cada cliente c_ en día d
-    sum(p_ in 1..p)( X[p_, c_, d] ) >= G * demand[c_, d]
+  % 2) Cobertura de demanda y no excederla
+  forall(c in 1..nc, d in 1..nd) (
+    sum(pl in 1..np)( prod[pl,c,d] ) >= G * dem[c,d]
     /\
-    % no superar la demanda real
-    sum(p_ in 1..p)( X[p_, c_, d] ) <= demand[c_, d]
+    sum(pl in 1..np)( prod[pl,c,d] ) <= dem[c,d]
   )
   /\
-  forall(p_ in 1..p, d in 1..n) (
-    % 3) Definir isHigh[p_, d] según si sobrepasa o no el umbral highThreshold[p_]
-    isHigh[p_, d] <-> ( sum(c in 1..m)(X[p_, c, d]) > highThreshold[p_] * capacity[p_] )
+  % 3) Definir régimen alto según umbral
+  forall(pl in 1..np, d in 1..nd) (
+    alto[pl,d] <-> ( sum(c in 1..nc)( prod[pl,c,d] ) > umbralAlto[pl] * cap[pl] )
   )
   /\
-  forall(p_ in 1..p) (
-    % 4) Prohibir exceder 'maxConsecutiveHigh[p_]' días consecutivos en régimen alto
-    forall(d in 1..(n-1)) (
-      if maxConsecutiveHigh[p_] = 1 then
-        isHigh[p_, d] + isHigh[p_, d+1] <= 1
-      else
-        true
-      endif
+  % 4) Ventana deslizante: no más de maxDiasAlto días consecutivos en alto
+  forall(pl in 1..np) (
+    forall(inicio in 1..nd - maxDiasAlto[pl]) (
+      sum(d in inicio..inicio + maxDiasAlto[pl]) ( bool2int(alto[pl,d]) )
+        <= maxDiasAlto[pl]
     )
   );
 
-% función objetivo: Maximizar Ganancia.
+% FUNCIÓN OBJETIVO
+var float: ganancia =
+  sum(pl in 1..np, c in 1..nc, d in 1..nd)( prod[pl,c,d] * pago[c] )
+  -
+  sum(pl in 1..np, c in 1..nc, d in 1..nd)( prod[pl,c,d] * costo[pl] );
 
-% Ganancia = Ingresos - Costos
-% Ingresos = sum(p, c, d)( X[p,c,d] * payment[c] )
-% Costos   = sum(p, c, d)( X[p,c,d] * cost[p] )
+% ESTRATEGIAS DE BÚSQUEDA
 
-var float: totalProfit = 
-  sum(p_ in 1..p, c_ in 1..m, d in 1..n) (
-    X[p_, c_, d] * payment[c_]
-  )
-  - 
-  sum(p_ in 1..p, c_ in 1..m, d in 1..n) (
-    X[p_, c_, d] * cost[p_]
-  );
+% Estrategia 0: por defecto
+solve maximize ganancia;
 
-solve maximize totalProfit;
+% Estrategia 1: heurística first_fail + indomain_min
+% solve :: int_search([
+%   prod[pl,c,d] | pl in 1..np, c in 1..nc, d in 1..nd
+% ], first_fail, indomain_min, complete) maximize ganancia;
 
+% Estrategia 2: orden de entrada + indomain_max
+% solve :: int_search([
+%   prod[pl,c,d] | pl in 1..np, c in 1..nc, d in 1..nd
+% ], input_order, indomain_max, complete) maximize ganancia;
+
+% IMPRESIÓN EN CONSOLA
 output [
-  "Ganancia total = ", show(totalProfit), "\n",
-  "Distribución (MW) por planta-cliente-día:\n",
-  join("", 
-    [ 
-      "Planta: " ++ show(plantNames[p_]) ++ 
-      ", Cliente: " ++ show(clientNames[c_]) ++ 
-      ", Día: " ++ show(d) ++ 
-      " -> " ++ show(X[p_,c_,d]) ++ "\n"
-      | p_ in 1..p, c_ in 1..m, d in 1..n
-    ]
-  ),
-  "\nRégimen alto por planta/día:\n",
-  join("", 
-    [
-      "Planta: " ++ show(plantNames[p_]) ++
-      ", Día: " ++ show(d) ++ 
-      ", Régimen alto = " ++ show(isHigh[p_,d]) ++ "\n"
-      | p_ in 1..p, d in 1..n
-    ]
-  )
+  "===== Resultado de la optimización =====\n",
+  "Ganancia total: ", show(ganancia), "\n\n",
+  "--- Producción total por planta y día ---\n",
+  concat([ "Día " ++ show(d) ++ ":\n" ++
+           concat([ nombrePlanta[pl] ++ ": " ++ show(sum(c in 1..nc)(prod[pl,c,d])) ++ " MW\n" | pl in 1..np ]) ++ "\n"
+         | d in 1..nd ]),
+  "--- Detalle producción planta->cliente->día ---\n",
+  concat([ nombrePlanta[pl] ++ "->" ++ nombreCliente[c] ++
+           " (Día " ++ show(d) ++ "): " ++ show(prod[pl,c,d]) ++ "\n"
+         | pl in 1..np, c in 1..nc, d in 1..nd ]),
+  "\n--- Régimen alto por planta y día ---\n",
+  concat([ "Día " ++ show(d) ++ " - " ++ nombrePlanta[pl] ++ ": " ++ show(alto[pl,d]) ++ "\n"
+         | d in 1..nd, pl in 1..np ])
 ];
