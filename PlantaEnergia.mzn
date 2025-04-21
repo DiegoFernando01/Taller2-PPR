@@ -66,14 +66,10 @@ var float: ganancia =
 solve maximize ganancia;
 
 % Estrategia 1: heurística first_fail + indomain_min
-% solve :: int_search([
-%   prod[pl,c,d] | pl in 1..np, c in 1..nc, d in 1..nd
-% ], first_fail, indomain_min, complete) maximize ganancia;
+% solve :: int_search([prod[pl,c,d] | pl in 1..np, c in 1..nc, d in 1..nd], first_fail, indomain_min, complete) maximize ganancia;
 
 % Estrategia 2: orden de entrada + indomain_max
-% solve :: int_search([
-%   prod[pl,c,d] | pl in 1..np, c in 1..nc, d in 1..nd
-% ], input_order, indomain_max, complete) maximize ganancia;
+% solve :: int_search([prod[pl,c,d] | pl in 1..np, c in 1..nc, d in 1..nd], input_order, indomain_max, complete) maximize ganancia;
 
 % IMPRESIÓN EN CONSOLA
 output [
