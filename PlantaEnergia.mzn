@@ -21,7 +21,8 @@ array[1..np] of int: maxDiasAlto; % máx. días consecutivos en alto por planta
 
 % DOMINIOS
 int: capMax = max(i in 1..np)(cap[i]);  % capacidad máxima global
-
+% capacidad total disponible por día
+array[1..nd] of int: capDiaria = [ sum(pl in 1..np)(cap[pl]) | d in 1..nd ];
 % produccion[planta, cliente, día]
 array[1..np,1..nc,1..nd] of var 0..capMax: prod;
 % alto[planta, día] = 1 si está en régimen alto
@@ -34,11 +35,15 @@ constraint
     sum(c in 1..nc)( prod[pl,c,d] ) <= cap[pl]
   )
   /\
-  % 2) Cobertura de demanda y no excederla
+  % 2) Cobertura total o mínimo G%
   forall(c in 1..nc, d in 1..nd) (
-    sum(pl in 1..np)( prod[pl,c,d] ) >= G * dem[c,d]
-    /\
-    sum(pl in 1..np)( prod[pl,c,d] ) <= dem[c,d]
+    if capDiaria[d] < dem[c,d] then
+      % no alcanza para cubrir toda la demanda
+      sum(pl in 1..np)( prod[pl,c,d] ) >= G * dem[c,d]
+    else
+      % sí alcanza, cubrir exactamente
+      sum(pl in 1..np)( prod[pl,c,d] ) == dem[c,d]
+    endif
   )
   /\
   % 3) Definir régimen alto según umbral
