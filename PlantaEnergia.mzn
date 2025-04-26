@@ -20,7 +20,6 @@ array[1..np] of float: umbralAlto; % umbral para régimen alto (0.0 - 1.0) por p
 array[1..np] of int: maxDiasAlto; % máx. días consecutivos en alto por planta
 array[1..nd] of int: demTotal = [ sum(c in 1..nc)( dem[c,d] ) | d in 1..nd ]; % demanda total por día
 
-
 % DOMINIOS
 int: capMax = max(i in 1..np)(cap[i]);  % capacidad máxima global
 % capacidad total disponible por día
@@ -67,14 +66,13 @@ constraint
   forall(c in 1..nc, d in 1..nd) (
     sum(pl in 1..np)( prod[pl,c,d] )
       <= dem[c,d]
-);
-
-constraint
-% 6) La producción total diaria no supera la capacidad global
+  )
+  /\
+  % 6) La producción total diaria no supera la capacidad global
   forall(d in 1..nd) (
     sum(pl in 1..np, c in 1..nc)( prod[pl,c,d] )
-      <= capDiaria[d]
-);
+      <= capDiaria[d]
+  );
 
 % FUNCIÓN OBJETIVO
 var float: ganancia =
