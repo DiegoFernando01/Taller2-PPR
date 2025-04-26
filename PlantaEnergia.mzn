@@ -61,6 +61,21 @@ constraint
     )
   );
 
+% RESTRICCIONES REDUNDANTES
+constraint
+  % 5) No exceder nunca la demanda de cada cliente
+  forall(c in 1..nc, d in 1..nd) (
+    sum(pl in 1..np)( prod[pl,c,d] )
+      <= dem[c,d]
+);
+
+constraint
+% 6) La producción total diaria no supera la capacidad global
+  forall(d in 1..nd) (
+    sum(pl in 1..np, c in 1..nc)( prod[pl,c,d] )
+      <= capDiaria[d]
+);
+
 % FUNCIÓN OBJETIVO
 var float: ganancia =
   sum(pl in 1..np, c in 1..nc, d in 1..nd)( prod[pl,c,d] * pago[c] )
