@@ -18,6 +18,8 @@ array[1..nc,1..nd] of int: dem; % demanda de cada cliente c en el día d
 float: G; % porcentaje mínimo de cobertura (0.0 - 1.0)
 array[1..np] of float: umbralAlto; % umbral para régimen alto (0.0 - 1.0) por planta
 array[1..np] of int: maxDiasAlto; % máx. días consecutivos en alto por planta
+array[1..nd] of int: demTotal = [ sum(c in 1..nc)( dem[c,d] ) | d in 1..nd ]; % demanda total por día
+
 
 % DOMINIOS
 int: capMax = max(i in 1..np)(cap[i]);  % capacidad máxima global
@@ -37,7 +39,7 @@ constraint
   /\
   % 2) Cobertura total o mínimo G%
   forall(c in 1..nc, d in 1..nd) (
-    if capDiaria[d] < dem[c,d] then
+    if capDiaria[d] < demTotal[d] then
       % no alcanza para cubrir toda la demanda
       sum(pl in 1..np)( prod[pl,c,d] ) >= G * dem[c,d]
     else
